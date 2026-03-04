@@ -1,0 +1,118 @@
+{% extends 'forecast/base.html' %}
+
+{% block title %}Track weather with real-time insights{% endblock %}
+
+{% block content %}
+<section class="glass-panel hero-panel p-4 p-md-5 mb-4">
+  <div class="row align-items-center g-4">
+    <div class="col-12 col-lg-7">
+      <p class="eyebrow mb-2">Smart Weather Workspace</p>
+      <h1 class="display-5 fw-bold mb-3">Track weather with real-time insights</h1>
+      <p class="hero-copy mb-4">Search any city or ZIP, switch units instantly, and get a rich 7-day outlook with better context.</p>
+
+      <form action="{% url 'forecast:search_weather' %}" method="get" class="search-form js-search-form" autocomplete="off">
+        <div class="search-row">
+          <div class="position-relative flex-grow-1">
+            <input
+              type="text"
+              name="q"
+              value="{{ query|default:'' }}"
+              class="form-control form-control-lg glass-input js-location-input"
+              placeholder="Search city or ZIP (e.g. Tokyo, 10001,us)"
+            >
+            <ul class="suggestion-list d-none js-suggestion-list"></ul>
+            <input type="hidden" name="lat" class="js-lat-field">
+            <input type="hidden" name="lon" class="js-lon-field">
+            <input type="hidden" name="use_location" class="js-use-location" value="0">
+          </div>
+          <select name="unit" class="form-select form-select-lg glass-select unit-select">
+            <option value="celsius" {% if selected_unit == 'celsius' %}selected{% endif %}>Celsius</option>
+            <option value="fahrenheit" {% if selected_unit == 'fahrenheit' %}selected{% endif %}>Fahrenheit</option>
+          </select>
+          <button type="button" class="btn glass-btn js-location-btn">Use my location</button>
+          <button type="submit" class="btn btn-light fw-semibold px-4 js-submit-btn">Search</button>
+        </div>
+      </form>
+
+      {% if error %}
+      <div class="glass-error mt-3" role="alert">
+        {% if error == 'Type place' %}
+          {{ error }}
+        {% else %}
+          <strong>Could not load weather.</strong> {{ error }}
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <div class="glass-panel mini-stats p-4">
+        <h2 class="h6 mb-3 feature-context js-feature-context">
+          Detecting your current location for personalized insights.
+        </h2>
+        <p class="feature-today js-feature-today mb-3">
+          <span class="feature-temp-label">Today's temperature</span>
+          <span class="feature-temp-value">--</span>
+          <span class="feature-temp-meta">Detecting current location...</span>
+        </p>
+        <div class="feature-idea-grid js-feature-ideas mb-3">
+          <article class="feature-idea-card is-active" data-feature="rain-alert">
+            <div class="feature-card-head">
+              <button type="button" class="feature-main-btn">Rain Start Alert</button>
+              <button type="button" class="feature-arrow-btn js-feature-arrow" aria-label="Toggle description">▾</button>
+            </div>
+            <p class="feature-card-desc">Detect likely rain timing in your selected location.</p>
+          </article>
+          <article class="feature-idea-card" data-feature="commute-score">
+            <div class="feature-card-head">
+              <button type="button" class="feature-main-btn">Commute Comfort Score</button>
+              <button type="button" class="feature-arrow-btn js-feature-arrow" aria-label="Toggle description">▾</button>
+            </div>
+            <p class="feature-card-desc">Get a 0-100 commute comfort score from current conditions.</p>
+          </article>
+          <article class="feature-idea-card" data-feature="outdoor-planner">
+            <div class="feature-card-head">
+              <button type="button" class="feature-main-btn">Outdoor Planner</button>
+              <button type="button" class="feature-arrow-btn js-feature-arrow" aria-label="Toggle description">▾</button>
+            </div>
+            <p class="feature-card-desc">Find the best upcoming outdoor window.</p>
+          </article>
+          <article class="feature-idea-card" data-feature="aq-tips">
+            <div class="feature-card-head">
+              <button type="button" class="feature-main-btn">Air Quality Tips</button>
+              <button type="button" class="feature-arrow-btn js-feature-arrow" aria-label="Toggle description">▾</button>
+            </div>
+            <p class="feature-card-desc">Get practical air-quality guidance from live AQI data.</p>
+          </article>
+          <article class="feature-idea-card" data-feature="city-compare">
+            <div class="feature-card-head">
+              <button type="button" class="feature-main-btn">City Weather Compare</button>
+              <button type="button" class="feature-arrow-btn js-feature-arrow" aria-label="Toggle description">▾</button>
+            </div>
+            <p class="feature-card-desc">Compare your current city with another city instantly.</p>
+          </article>
+          <article class="feature-idea-card" data-feature="wardrobe">
+            <div class="feature-card-head">
+              <button type="button" class="feature-main-btn">Wardrobe Suggestion</button>
+              <button type="button" class="feature-arrow-btn js-feature-arrow" aria-label="Toggle description">▾</button>
+            </div>
+            <p class="feature-card-desc">Get outfit guidance based on current weather.</p>
+          </article>
+        </div>
+
+        <div class="feature-controls mt-3">
+          <input
+            type="text"
+            class="form-control glass-input d-none js-compare-city"
+            placeholder="Compare with another city (e.g. Dubai)"
+          >
+        </div>
+
+        <div class="feature-output mt-3 js-feature-output">
+          Press any feature button to generate live results.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

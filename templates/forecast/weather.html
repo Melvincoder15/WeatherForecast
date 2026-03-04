@@ -1,0 +1,97 @@
+{% extends 'forecast/base.html' %}
+
+{% block title %}{{ current.city }} Weather{% endblock %}
+
+{% block content %}
+<section class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h1 class="h2 mb-1">{{ current.city }}, {{ current.country }}</h1>
+    <p class="text-light opacity-75 mb-0">{{ current.description }}</p>
+  </div>
+  <form action="{% url 'forecast:search_weather' %}" method="get" class="d-flex gap-2">
+    <input type="hidden" name="q" value="{{ query }}">
+    <select name="unit" class="form-select" onchange="this.form.submit()">
+      <option value="celsius" {% if current.unit == 'celsius' %}selected{% endif %}>Celsius</option>
+      <option value="fahrenheit" {% if current.unit == 'fahrenheit' %}selected{% endif %}>Fahrenheit</option>
+    </select>
+  </form>
+</section>
+
+<section class="row g-3 mb-4">
+  <div class="col-12 col-lg-5">
+    <div class="card weather-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <p class="text-light opacity-75 mb-2">Current Temperature</p>
+            <p class="display-4 fw-bold mb-1">{{ current.temperature }}&deg;{{ current.unit_symbol }}</p>
+            <p class="mb-0">Feels like {{ current.feels_like }}&deg;{{ current.unit_symbol }}</p>
+          </div>
+          <img
+            src="https://openweathermap.org/img/wn/{{ current.icon }}@2x.png"
+            width="90"
+            height="90"
+            alt="{{ current.description }}"
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-7">
+    <div class="card weather-panel shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Current Conditions</h2>
+        <div class="row text-center g-3">
+          <div class="col-6 col-md-4">
+            <div class="metric-box rounded-3 p-3">
+              <p class="small mb-1">Humidity</p>
+              <p class="h4 mb-0">{{ current.humidity }}%</p>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="metric-box rounded-3 p-3">
+              <p class="small mb-1">Wind Speed</p>
+              <p class="h4 mb-0">{{ current.wind_speed }} m/s</p>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="metric-box rounded-3 p-3">
+              <p class="small mb-1">Condition</p>
+              <p class="h6 mb-0">{{ current.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card weather-panel shadow-sm">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Multi-Day Forecast</h2>
+    <div class="forecast-scroll d-flex gap-3">
+      {% for day in forecast %}
+      <article class="forecast-day rounded-3 p-3 text-center">
+        <p class="fw-semibold mb-1">{{ day.weekday }}</p>
+        <p class="small mb-2 text-light opacity-75">{{ day.date }}</p>
+        <img
+          src="https://openweathermap.org/img/wn/{{ day.icon }}.png"
+          width="48"
+          height="48"
+          alt="{{ day.description }}"
+        >
+        <p class="small mb-2">{{ day.description }}</p>
+        <p class="mb-0"><strong>{{ day.temp_max }}&deg;</strong> / {{ day.temp_min }}&deg;</p>
+      </article>
+      {% empty %}
+      <p class="mb-0 text-light opacity-75">No forecast data available.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="mt-4">
+  <a href="{% url 'forecast:home' %}" class="btn btn-link ps-0 text-light">Search another location</a>
+</div>
+{% endblock %}
