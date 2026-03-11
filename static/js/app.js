@@ -1,4 +1,10 @@
 (function () {
+  const ACCURATE_GEO_OPTIONS = {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0,
+  };
+
   function bySelector(selector, scope) {
     return Array.from((scope || document).querySelectorAll(selector));
   }
@@ -169,9 +175,9 @@
             useLocationField.value = "0";
           }
           resetLocationButton(button);
-          alert("Could not get your location. Please allow location access and try again.");
+          alert("Could not get exact location. Please type in your location.");
         },
-        { timeout: 10000 }
+        ACCURATE_GEO_OPTIONS
       );
     });
   }
@@ -335,14 +341,6 @@
               },
             })
           );
-          localStorage.setItem(
-            "wf_last_coords",
-            JSON.stringify({
-              at: Date.now(),
-              lat,
-              lon,
-            })
-          );
           setContextText(lat, lon, shownArea);
         } catch (error) {
           renderTodayCard("--", error.message || "Unable to load current temperature.");
@@ -361,21 +359,6 @@
           return;
         }
 
-        const savedCoordsRaw = localStorage.getItem("wf_last_coords");
-        if (savedCoordsRaw) {
-          try {
-            const saved = JSON.parse(savedCoordsRaw);
-            const isFresh = Date.now() - Number(saved.at || 0) < 24 * 60 * 60 * 1000;
-            if (isFresh && saved.lat && saved.lon) {
-              latField.value = String(saved.lat);
-              lonField.value = String(saved.lon);
-              loadCurrentSummary(String(saved.lat), String(saved.lon), "");
-            }
-          } catch (error) {
-            // Ignore cached coordinate parsing issues.
-          }
-        }
-
         if (showLoadingState) {
           renderTodayCard("--", "Detecting current location...");
         }
@@ -389,14 +372,10 @@
             loadCurrentSummary(lat, lon, "");
           },
           () => {
-            renderTodayCard("--", "Location access denied. Enable location to use home insights.");
+            renderTodayCard("--", "Location access denied. Please type in your location.");
             setContextText("", "", "");
           },
-          {
-            timeout: 7000,
-            maximumAge: 300000,
-            enableHighAccuracy: false,
-          }
+          ACCURATE_GEO_OPTIONS
         );
       }
 
